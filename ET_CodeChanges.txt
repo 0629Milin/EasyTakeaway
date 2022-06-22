@@ -1,0 +1,142 @@
+
+---------------------------GeneralHelper---------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace EasyTakeaway.Models
+{
+    public static class GeneralHelper
+    {
+        /// <summary>
+        /// To Bind the List of Categories
+        /// </summary>
+        /// <returns></returns>
+        public static IList<CategoryModel> GetCategories()
+        {
+            IList<CategoryModel> lstCategoryModel;
+
+            try
+            {
+                lstCategoryModel = new[]
+                {
+                    new CategoryModel { Id = 1, CategpryCode = "LF", Title="Live Food", ImageName="livefood.png"},
+                    new CategoryModel { Id = 2, CategpryCode = "PF" , Title="Ready To Take", ImageName="preparedfood.jpg"}
+                }.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return lstCategoryModel;
+        }
+
+        /// <summary>
+        /// To Bind the List of Menu
+        /// </summary>
+        /// <returns></returns>
+        public static IList<MenuModel> GetMenuList(string strCategoryCode)
+        {
+            IList<MenuModel> lstMenuModel = null;
+
+            try
+            {
+                switch (strCategoryCode.ToUpperInvariant())
+                {
+                    case "LF":
+                        lstMenuModel = new[]
+                        {
+                                new MenuModel { Id = 1, Name="Fafda", UOM="Kg", QTY=1, Price=400, ImageName="livefood.png"}
+                        }.ToList();
+                        break;
+                    case "PF":
+                        lstMenuModel = new[]
+                        {
+                                new MenuModel { Id = 1, Name="Papdi", UOM="Kg", QTY=1, Price=300, ImageName="preparedfood.jpg"}
+                        }.ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return lstMenuModel;
+        }
+
+        /// <summary>
+        /// To Bind the Menu Item Description
+        /// </summary>
+        /// <returns></returns>
+        public static MenuModel GetItemDesc(int intItemId)
+        {
+            MenuModel MenuItem = null;
+            try
+            {
+
+                IList<MenuModel> lstMenuItem = new[]
+                {
+                    new MenuModel { Id = 1, Name = "F", Price=200, ImageName="livefood.png", QTY=1, UOM="KG"},
+                    new MenuModel { Id = 2, Name = "G", Price=150, ImageName="livefood.png", QTY=1, UOM="KG"},
+                }.ToList();
+
+                MenuItem = (from item in lstMenuItem
+                                  where item.Id == intItemId
+                                  select item).First();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return MenuItem;
+        }
+    }
+}
+--------------------------------------DashboardController--------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using EasyTakeaway.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace EasyTakeaway.Controllers
+{
+    public class DashboardController : Controller
+    {
+        public IActionResult Index()
+        {
+            // Bind list of main food categories
+            CategoryViewModel objCategoryViewModel = new CategoryViewModel();
+            objCategoryViewModel.CategoryDataList = (List<CategoryModel>)GeneralHelper.GetCategories();
+
+            return View(objCategoryViewModel);
+        }
+
+
+        public IActionResult GetMenuList(string strCategoryCode)
+        {
+            // Bind category wise menulist
+            MenuViewModel objMenuViewModel = new MenuViewModel();
+            objMenuViewModel.MenuList = (List<MenuModel>)GeneralHelper.GetMenuList(strCategoryCode);
+
+
+            return View();
+        }
+
+        public IActionResult ItemDescription(int intItemId)
+        {
+            // Bind item description by itemID
+            MenuModel objMenuItem = new MenuModel();
+            objMenuItem = (MenuModel)GeneralHelper.GetItemDesc(intItemId);
+
+            return View();
+        }
+    }
+}
+----------------------------------------------------------------------
